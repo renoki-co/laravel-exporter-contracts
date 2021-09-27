@@ -5,6 +5,7 @@ namespace RenokiCo\LaravelExporter;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
 use Prometheus\RenderTextFormat;
+use Prometheus\Storage\InMemory;
 
 class Exporter
 {
@@ -27,21 +28,24 @@ class Exporter
     ];
 
     /**
-     * The Collector Registry for this session.
+     * The Collector Registries for groups.
      *
-     * @var \Prometheus\CollectorRegistry
+     * @var \Prometheus\CollectorRegistry[]
      */
-    protected static CollectorRegistry $registry;
+    protected static array $registries = [
+        //
+    ];
 
     /**
      * Set the registry.
      *
      * @param  \Prometheus\CollectorRegistry  $collectorRegistry
+     * @param  string  $group
      * @return void
      */
-    public static function setRegistry(CollectorRegistry $registry)
+    public static function setRegistry(CollectorRegistry $registry, string $group = 'metrics')
     {
-        self::$registry = $registry;
+        self::$registries[$group] = $registry;
     }
 
     /**
@@ -78,13 +82,20 @@ class Exporter
     /**
      * Add the registered metrics to the Prometheus registry.
      *
+     * @param  string  $group
      * @return \Prometheus\CollectorRegistry
      */
-    public static function run()
+    public static function run($group = 'metrics')
     {
         foreach (static::$metrics as $metricClass) {
+            if (! isset(static::$registries[$metricClass::$showsOnGroup])) {
+                static::setRegistry(new CollectorRegistry(new InMemory), $metricClass::$showsOnGroup);
+            }
+
             /** @var \RenokiCo\LaravelExporter\Metric $metric */
-            $metric = new $metricClass(static::$registry);
+            $metric = new $metricClass(
+                static::$registries[$metricClass::$showsOnGroup]
+            );
 
             try {
                 $metric->registerCollector();
@@ -98,18 +109,19 @@ class Exporter
             static::$registeredMetrics[$metricClass] = $metric;
         }
 
-        return static::$registry;
+        return static::$registries[$group];
     }
 
     /**
      * Export the metrics as plaintext.
      *
+     * @param  string  $group
      * @return string
      */
-    public static function exportAsPlainText(): string
+    public static function exportAsPlainText(string $group = 'metrics'): string
     {
         return (new RenderTextFormat)->render(
-            static::run()->getMetricFamilySamples()
+            static::run($group)->getMetricFamilySamples()
         );
     }
 }

@@ -37,7 +37,7 @@ $ php artisan vendor:publish --provider="RenokiCo\LaravelExporter\LaravelExporte
 
 All you have to do is to create a `\RenokiCo\LaravelExporter\Metric` class that defines how the values will update on each Prometheus call to scrap, and the definition of the collector.
 
-The package will register a `/exporter/metrics` endpoint and you can point Prometheus towards it for scraping.
+By default, metrics are available on the `/exporter/metrics` endpoint and you can point Prometheus towards it for scraping. (i.e. `http://localhost/exporter/metrics`)
 
 ```php
 use RenokiCo\LaravelExporter\Metric;
@@ -98,6 +98,32 @@ class AppServiceProvider extends ServiceProvider
     }
 }
 ```
+
+## Grouping
+
+If you wish to have separate endpoints for different metrics, consider specifying it in the `$showsOnGroup` property:
+
+```php
+class CustomMetrics extends Metric
+{
+    /**
+     * The group this metric gets shown into.
+     *
+     * @var string|null
+     */
+    public static $showsOnGroup = 'metrics-reloaded';
+
+    // ...
+}
+```
+
+Under the hood, Laravel Exporter registers a route that allows you to scrape any group:
+
+```php
+Route::get('/exporter/{group?}', ...);
+```
+
+To scrape this specifc metric (and other metrics that are associated with this group), the endpoint is `/exporter/metrics-reloaded` (i.e. `http://localhost/exporter/metrics-reloaded`).
 
 ## 🐛 Testing
 

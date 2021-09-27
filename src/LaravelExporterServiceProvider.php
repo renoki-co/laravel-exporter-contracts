@@ -24,7 +24,7 @@ class LaravelExporterServiceProvider extends ServiceProvider
             __DIR__.'/../config/exporter.php', 'exporter'
         );
 
-        Exporter::setRegistry(new CollectorRegistry(new InMemory));
+        Exporter::setRegistry(new CollectorRegistry(new InMemory), group: 'metrics');
 
         Route::group([
             'domain' => config('exporter.domain', null),

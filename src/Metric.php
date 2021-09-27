@@ -15,6 +15,13 @@ abstract class Metric
     protected $collector;
 
     /**
+     * The group this metric gets shown into.
+     *
+     * @var string|null
+     */
+    public static $showsOnGroup = 'metrics';
+
+    /**
      * Initialize the metric.
      *
      * @param  \Prometheus\CollectorRegistry  $registry

@@ -4,7 +4,7 @@ namespace RenokiCo\LaravelExporter\Test\Fixtures;
 
 use RenokiCo\LaravelExporter\Metric;
 
-class TestMetric extends Metric
+class GroupedTestMetric extends Metric
 {
     /**
      * The collector to store the metric.
@@ -21,6 +21,13 @@ class TestMetric extends Metric
     public static $value = 100;
 
     /**
+     * The group this metric gets shown into.
+     *
+     * @var string|null
+     */
+    public static $showsOnGroup = 'new-metrics';
+
+    /**
      * Perform the update call on the collector.
      *
      * @return void
@@ -30,7 +37,7 @@ class TestMetric extends Metric
         $this->collector->set(
             value: static::$value,
             labels: [
-                'label1' => 'some-value',
+                'label1' => 'some-value-2',
             ],
         );
     }
@@ -44,7 +51,7 @@ class TestMetric extends Metric
     {
         return $this->collector = $this->registry->registerGauge(
             namespace: $this->getNamespace(),
-            name: 'custom_metric_name_1',
+            name: 'custom_metric_name_2',
             help: 'Add a relevant help text information.',
             labels: ['label1'],
         );
