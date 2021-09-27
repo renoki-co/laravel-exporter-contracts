@@ -39,46 +39,37 @@ All you have to do is to create a `\RenokiCo\LaravelExporter\Metric` class that 
 
 By default, metrics are available on the `/exporter/group/metrics` endpoint and you can point Prometheus towards it for scraping. (i.e. `http://localhost/exporter/group/metrics`)
 
-```php
-use RenokiCo\LaravelExporter\Metric;
+You can choose one of the following classes to extend:
 
-class CustomMetric extends Metric
+- `\RenokiCo\LaravelExporter\GaugeMetric` for gauges
+- `\RenokiCo\LaravelExporter\CounterMetric` for counters
+
+For example, you can define gauges for users:
+
+```php
+use RenokiCo\LaravelExporter\GaugeMetric;
+
+class DatabaseUsers extends GaugeMetric
 {
     /**
-     * The collector to store the metric.
+     * Get the metric help.
      *
-     * @var \Prometheus\Gauge
+     * @return string
      */
-    protected $collector;
+    protected function help(): string
+    {
+        return 'Get the total amount of users.';
+    }
 
     /**
      * Perform the update call on the collector.
+     * Optional, as some metrics can be modified somewhere else.
      *
      * @return void
      */
     public function update(): void
     {
-        $this->collector->set(
-            value: mt_rand(0, 100),
-            labels: [
-                'label1' => 'some-value',
-            ],
-        );
-    }
-
-    /**
-     * Register the collector to the registry.
-     *
-     * @return \Prometheus\Collector
-     */
-    public function registerCollector()
-    {
-        return $this->collector = $this->registry->registerGauge(
-            namespace: $this->getNamespace(),
-            name: 'custom_metric_name', // modify this to be unique,
-            help: 'Add a relevant help text information.',
-            labels: ['label1'], // optional
-        );
+        $this->set(User::count());
     }
 }
 ```
@@ -86,15 +77,70 @@ class CustomMetric extends Metric
 In your `AppServiceProvider`'s `boot()` method, register your metric:
 
 ```php
-use RenokiCo\LaravelExporter\LaravelExporter;
+use RenokiCo\LaravelExporter\Exporter;
 
 class AppServiceProvider extends ServiceProvider
 {
-    // ...
-
     public function boot()
     {
-        LaravelExporter::register(CustomMetric::class);
+        Exporter::register(DatabaseUsers::class);
+    }
+
+    // ...
+}
+```
+
+You don't need to set the values. When the Prometheus scraper will make the request for metrics, the gauge will automatically be set.
+
+## Labelling
+
+You may label data by setting default values (i.e. server name, static data, etc.) and on-update.
+
+```php
+class DatabaseRecords extends GaugeMetric
+{
+    /**
+     * Define the default labels with their values.
+     *
+     * @return array
+     */
+    protected function defaultLabels(): array
+    {
+        return [
+            'static_label' => 'static-value',
+        ];
+    }
+
+    /**
+     * Get the metric allowed labels.
+     *
+     * @return array
+     */
+    protected function allowedLabels(): array
+    {
+        return [
+            'model',
+            'static_label',
+        ];
+    }
+
+    /**
+     * Perform the update call on the collector.
+     * Optional, as some metrics can be modified somewhere else.
+     *
+     * @return void
+     */
+    public function update(): void
+    {
+        $models = [
+            User::class,
+            Post::class,
+            Team::class,
+        ];
+
+        foreach ($models as $model) {
+            $this->labels(['model' => $model])->set($model::count());
+        }
     }
 }
 ```

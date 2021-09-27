@@ -2,17 +2,10 @@
 
 namespace RenokiCo\LaravelExporter\Test\Fixtures;
 
-use RenokiCo\LaravelExporter\Metric;
+use RenokiCo\LaravelExporter\GaugeMetric;
 
-class GroupedTestMetric extends Metric
+class GroupedTestMetric extends GaugeMetric
 {
-    /**
-     * The collector to store the metric.
-     *
-     * @var \Prometheus\Gauge
-     */
-    protected $collector;
-
     /**
      * Assigned value for testing.
      *
@@ -34,26 +27,42 @@ class GroupedTestMetric extends Metric
      */
     public function update(): void
     {
-        $this->collector->set(
+        $this->labels(['label' => 'injected-value'])->set(
             value: static::$value,
-            labels: [
-                'label1' => 'some-value-2',
-            ],
         );
     }
 
     /**
-     * Register the collector to the registry.
+     * Get the metric name.
      *
-     * @return \Prometheus\Collector
+     * @return string
      */
-    public function registerCollector()
+    protected function name(): string
     {
-        return $this->collector = $this->registry->registerGauge(
-            namespace: $this->getNamespace(),
-            name: 'custom_metric_name_2',
-            help: 'Add a relevant help text information.',
-            labels: ['label1'],
-        );
+        return 'grouped_metric';
+    }
+
+    /**
+     * Define the default labels with their values.
+     *
+     * @return array
+     */
+    protected function defaultLabels(): array
+    {
+        return [
+            'label' => 'default-value',
+        ];
+    }
+
+    /**
+     * Get the metric allowed labels.
+     *
+     * @return array
+     */
+    protected function allowedLabels(): array
+    {
+        return [
+            'label',
+        ];
     }
 }

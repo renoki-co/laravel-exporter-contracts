@@ -92,19 +92,21 @@ class Exporter
                 static::setRegistry(new CollectorRegistry(new InMemory), $metricClass::$showsOnGroup);
             }
 
-            /** @var \RenokiCo\LaravelExporter\Metric $metric */
-            $metric = new $metricClass(
-                static::$registries[$metricClass::$showsOnGroup]
-            );
-
             try {
-                $metric->registerCollector();
-            } catch (MetricsRegistrationException $e) {
-                $metric = static::$registeredMetrics[$metricClass];
-            }
+                $metric = new $metricClass(
+                    static::$registries[$metricClass::$showsOnGroup]
+                );
 
-            /** @var \RenokiCo\LaravelExporter\Metric $metric */
-            $metric->update();
+                /** @var \RenokiCo\LaravelExporter\Metric $metric */
+                $metric->update();
+            } catch (MetricsRegistrationException $e) {
+                /** @var \RenokiCo\LaravelExporter\Metric|null $metric */
+                $metric = static::$registeredMetrics[$metricClass] ?? null;
+
+                if ($metric) {
+                    $metric->update();
+                }
+            }
 
             static::$registeredMetrics[$metricClass] = $metric;
         }
@@ -123,5 +125,18 @@ class Exporter
         return (new RenderTextFormat)->render(
             static::run($group)->getMetricFamilySamples()
         );
+    }
+
+    /**
+     * Get the registered metric.
+     *
+     * @param  string  $class
+     * @return \RenokiCo\LaravelExporter\Metric|null
+     */
+    public static function metric(string $class)
+    {
+        static::run($class::$showsOnGroup);
+
+        return static::$registeredMetrics[$class] ?? null;
     }
 }
