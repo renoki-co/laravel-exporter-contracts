@@ -1,17 +1,15 @@
-Package Name Here
-===================================
+Laravel Prometheus Exporter
+===========================
 
-![CI](https://github.com/renoki-co/:package_name/workflows/CI/badge.svg?branch=master)
-[![codecov](https://codecov.io/gh/renoki-co/:package_name/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/:package_name/branch/master)
+![CI](https://github.com/renoki-co/laravel-exporter-contracts/workflows/CI/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/renoki-co/laravel-exporter-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/laravel-exporter-contracts/branch/master)
 [![StyleCI](https://github.styleci.io/repos/:styleci_code/shield?branch=master)](https://github.styleci.io/repos/:styleci_code)
-[![Latest Stable Version](https://poser.pugx.org/renoki-co/:package_name/v/stable)](https://packagist.org/packages/renoki-co/:package_name)
-[![Total Downloads](https://poser.pugx.org/renoki-co/:package_name/downloads)](https://packagist.org/packages/renoki-co/:package_name)
-[![Monthly Downloads](https://poser.pugx.org/renoki-co/:package_name/d/monthly)](https://packagist.org/packages/renoki-co/:package_name)
-[![License](https://poser.pugx.org/renoki-co/:package_name/license)](https://packagist.org/packages/renoki-co/:package_name)
+[![Latest Stable Version](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/v/stable)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
+[![Total Downloads](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/downloads)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
+[![Monthly Downloads](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/d/monthly)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
+[![License](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/license)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
 
-**Note:** Replace  ```:package_name``` ```:package_description``` ```:package_namespace``` ```:package_service_provider``` ```:styleci_code``` with their correct values in [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE](LICENSE) and [composer.json](composer.json) files, then delete this line.
-
-This is where your description should go. Try and limit it to a paragraph or two. Consider adding a small example.
+Base contracts implementation for Prometheus exports in Laravel.
 
 ## 🤝 Supporting
 
@@ -26,25 +24,73 @@ You will sometimes get exclusive content on tips about Laravel, AWS or Kubernete
 You can install the package via composer:
 
 ```bash
-composer require renoki-co/:package_name
-```
-
-Publish the config:
-
-```bash
-$ php artisan vendor:publish --provider="RenokiCo\:package_namespace\:package_service_provider" --tag="config"
-```
-
-Publish the migrations:
-
-```bash
-$ php artisan vendor:publish --provider="RenokiCo\:package_namespace\:package_service_provider" --tag="migrations"
+composer require renoki-co/laravel-exporter-contracts
 ```
 
 ## 🙌 Usage
 
+All you have to do is to create a `\RenokiCo\LaravelExporter\Metric` class that defines how the values will update on each Prometheus call to scrap, and the definition of the collector.
+
+The package will register a `/metrics` endpoint and you can point Prometheus towards it for scraping.
+
 ```php
-$ //
+use RenokiCo\LaravelExporter\Metric;
+
+class CustomMetric extends Metric
+{
+    /**
+     * The collector to store the metric.
+     *
+     * @var \Prometheus\Gauge
+     */
+    protected $collector;
+
+    /**
+     * Perform the update call on the collector.
+     *
+     * @return void
+     */
+    public function update(): void
+    {
+        $this->collector->set(
+            value: mt_rand(0, 100),
+            labels: [
+                'label1' => 'some-value',
+            ],
+        );
+    }
+
+    /**
+     * Register the collector to the registry.
+     *
+     * @return \Prometheus\Collector
+     */
+    public function registerCollector()
+    {
+        return $this->collector = $this->registry->registerGauge(
+            namespace: $this->getNamespace(),
+            name: 'custom_metric_name', // modify this to be unique,
+            help: 'Add a relevant help text information.',
+            labels: ['label1'], // optional
+        );
+    }
+}
+```
+
+In your `AppServiceProvider`'s `boot()` method, register your metric:
+
+```php
+use RenokiCo\LaravelExporter\LaravelExporter;
+
+class AppServiceProvider extends ServiceProvider
+{
+    // ...
+
+    public function boot()
+    {
+        LaravelExporter::register(CustomMetric::class);
+    }
+}
 ```
 
 ## 🐛 Testing
