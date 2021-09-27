@@ -66,4 +66,3 @@ class GroupedTestMetric extends GaugeMetric
         ];
     }
 }
-
