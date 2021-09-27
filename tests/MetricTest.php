@@ -10,8 +10,8 @@ class MetricTest extends TestCase
 {
     public function test_registering_metric()
     {
-        Exporter::register(TestMetric::class);
-        Exporter::register(TestMetric::class);
+        Exporter::metrics([TestMetric::class]);
+        Exporter::metrics([TestMetric::class]);
 
         Exporter::register(GroupedTestMetric::class);
         Exporter::register(GroupedTestMetric::class);
