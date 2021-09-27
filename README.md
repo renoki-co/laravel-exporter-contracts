@@ -3,7 +3,7 @@ Laravel Prometheus Exporter
 
 ![CI](https://github.com/renoki-co/laravel-exporter-contracts/workflows/CI/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/renoki-co/laravel-exporter-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/laravel-exporter-contracts/branch/master)
-[![StyleCI](https://github.styleci.io/repos/:styleci_code/shield?branch=master)](https://github.styleci.io/repos/:styleci_code)
+[![StyleCI](https://github.styleci.io/repos/410802300/shield?branch=master)](https://github.styleci.io/repos/410802300)
 [![Latest Stable Version](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/v/stable)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
 [![Total Downloads](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/downloads)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
 [![Monthly Downloads](https://poser.pugx.org/renoki-co/laravel-exporter-contracts/d/monthly)](https://packagist.org/packages/renoki-co/laravel-exporter-contracts)
