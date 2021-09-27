@@ -27,11 +27,17 @@ You can install the package via composer:
 composer require renoki-co/laravel-exporter-contracts
 ```
 
+Publish the config:
+
+```bash
+$ php artisan vendor:publish --provider="RenokiCo\LaravelExporter\LaravelExporterServiceProvider" --tag="config"
+```
+
 ## 🙌 Usage
 
 All you have to do is to create a `\RenokiCo\LaravelExporter\Metric` class that defines how the values will update on each Prometheus call to scrap, and the definition of the collector.
 
-The package will register a `/metrics` endpoint and you can point Prometheus towards it for scraping.
+The package will register a `/exporter/metrics` endpoint and you can point Prometheus towards it for scraping.
 
 ```php
 use RenokiCo\LaravelExporter\Metric;

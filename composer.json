@@ -1,7 +1,7 @@
 {
     "name": "renoki-co/laravel-exporter-contracts",
-    "description": "Export Laravel Octane metrics using this Prometheus exporter.",
-    "keywords": ["laravel", "php"],
+    "description": "Base contracts implementation for Prometheus exports in Laravel.",
+    "keywords": ["laravel", "php", "prometheus", "metrics", "exporter"],
     "license": "Apache-2.0",
     "homepage": "https://github.com/renoki-co/laravel-exporter-contracts",
     "authors": [
@@ -12,7 +12,11 @@
         }
     ],
     "require": {
-        "php": "^8.0"
+        "php": "^8.0",
+        "promphp/prometheus_client_php": "^2.0",
+        "illuminate/config": "^8.40",
+        "illuminate/routing": "^8.40",
+        "illuminate/support": "^8.40"
     },
     "autoload": {
         "psr-4": {
