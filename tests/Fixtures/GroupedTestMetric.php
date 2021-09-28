@@ -27,8 +27,9 @@ class GroupedTestMetric extends GaugeMetric
      */
     public function update(): void
     {
-        $this->labels(['label' => 'injected-value'])->set(
+        $this->set(
             value: static::$value,
+            labels: ['label' => 'injected-value'],
         );
     }
 

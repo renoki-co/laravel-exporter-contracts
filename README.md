@@ -139,7 +139,10 @@ class DatabaseRecords extends GaugeMetric
         ];
 
         foreach ($models as $model) {
-            $this->labels(['model' => $model])->set($model::count());
+            $this->set(
+                value: $model::count(),
+                labels: ['model' => $model,
+            ]);
         }
     }
 }

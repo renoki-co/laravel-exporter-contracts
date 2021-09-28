@@ -49,9 +49,7 @@ class MetricTest extends TestCase
             Exporter::exportAsPlainText()
         );
 
-        Exporter::metric(OutsideMetric::class)
-            ->labels(['label' => 'injected-value'])
-            ->incBy(20);
+        Exporter::metric(OutsideMetric::class)->incBy(20, ['label' => 'injected-value']);
 
         $this->assertStringContainsString(
             'laravel_outside_metric{label="injected-value"} 20',

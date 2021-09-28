@@ -15,22 +15,24 @@ abstract class GaugeMetric extends CounterMetric
      * Set the value for the gauge.
      *
      * @param  float  $value
+     * @param  array  $labels
      * @return mixed[]
      */
-    public function set($value)
+    public function set($value, array $labels = [])
     {
-        return $this->collector->set($value, $this->getLabels());
+        return $this->collector->set($value, $this->getLabels($labels));
     }
 
     /**
      * Decrement by a specific count.
      *
      * @param  int|float  $count
+     * @param  array  $labels
      * @return mixed[]
      */
-    public function decBy($count)
+    public function decBy($count, array $labels)
     {
-        return $this->collector->decBy($count, $this->getLabels());
+        return $this->collector->decBy($count, $this->getLabels($labels));
     }
 
     /**

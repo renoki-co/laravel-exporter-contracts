@@ -15,11 +15,12 @@ abstract class CounterMetric extends Metric
      * Increment by a specific count.
      *
      * @param  int|float  $count
+     * @param  array  $labels
      * @return mixed[]
      */
-    public function incBy($count)
+    public function incBy($count, array $labels = [])
     {
-        return $this->collector->incBy($count, $this->getLabels());
+        return $this->collector->incBy($count, $this->getLabels($labels));
     }
 
     /**

@@ -39,11 +39,12 @@ abstract class Metric
     /**
      * Get the labels used to mark methods with.
      *
+     * @param  array  $labels
      * @return array
      */
-    protected function getLabels(): array
+    protected function getLabels(array $labels = []): array
     {
-        return array_merge($this->defaultLabels(), $this->labels);
+        return array_merge($this->defaultLabels(), $labels);
     }
 
     /**
@@ -67,20 +68,6 @@ abstract class Metric
         return [
             //
         ];
-    }
-
-    /**
-     * Set the labels. They will be merged
-     * with the default ones.
-     *
-     * @param  array  $labels
-     * @return $this
-     */
-    public function labels(array $labels)
-    {
-        $this->labels = $labels;
-
-        return $this;
     }
 
     /**
