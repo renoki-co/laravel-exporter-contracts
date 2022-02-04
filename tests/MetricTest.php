@@ -56,4 +56,51 @@ class MetricTest extends TestCase
             Exporter::exportAsPlainText()
         );
     }
+
+    public function test_response_with_plain_text()
+    {
+        Exporter::metrics([OutsideMetric::class]);
+
+        Exporter::metric(OutsideMetric::class)->incBy(20);
+
+        $this->assertStringContainsString(
+            'laravel_outside_metric{label="default-label"} 20',
+            Exporter::exportAsPlainText()
+        );
+
+        Exporter::metric(OutsideMetric::class)->incBy(20, ['label' => 'injected-value']);
+
+        Exporter::exportResponse('some-random-text');
+
+        $this->assertStringContainsString(
+            'some-random-text',
+            Exporter::exportAsPlainText()
+        );
+    }
+
+    public function test_response_with_plain_text_on_different_group()
+    {
+        Exporter::metrics([OutsideMetric::class]);
+
+        Exporter::metric(OutsideMetric::class)->incBy(20);
+
+        $this->assertStringContainsString(
+            'laravel_outside_metric{label="default-label"} 20',
+            Exporter::exportAsPlainText()
+        );
+
+        Exporter::metric(OutsideMetric::class)->incBy(20, ['label' => 'injected-value']);
+
+        Exporter::exportResponse('some-random-text', 'metrics2');
+
+        $this->assertStringContainsString(
+            'laravel_outside_metric{label="default-label"} 20',
+            Exporter::exportAsPlainText()
+        );
+
+        $this->assertStringContainsString(
+            'some-random-text',
+            Exporter::exportAsPlainText('metrics2')
+        );
+    }
 }

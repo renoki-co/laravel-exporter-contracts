@@ -172,6 +172,33 @@ Route::get('/exporter/group/{group?}', ...);
 
 To scrape this specifc metric (and other metrics that are associated with this group), the endpoint is `/exporter/group/metrics-reloaded` (i.e. `http://localhost/exporter/group/metrics-reloaded`).
 
+## Sending string responses
+
+In some cases you may want to export the string-alike, Prometheus-formatted response without using the internal metrics.
+
+To do so, use the `exportResponse` function. The function will return the response directly instead of relying on the `Metric` class and subsequent class registrations via the `Exporter::register()` function.
+
+```php
+use RenokiCo\LaravelExporter\Exporter;
+
+Exporter::exportResponse(<<<'PROM'
+# TYPE openswoole_max_conn gauge
+openswoole_max_conn 256
+# TYPE openswoole_coroutine_num gauge
+openswoole_coroutine_num 1
+PROM;)
+```
+
+When accessing the `/metrics` endpoint, the response will be the one declared earlier.
+
+For custom groups, pass a second parameter with the group name:
+
+```php
+use RenokiCo\LaravelExporter\Exporter;
+
+Exporter::exportResponse(..., 'metrics-reloaded');
+```
+
 ## 🐛 Testing
 
 ``` bash

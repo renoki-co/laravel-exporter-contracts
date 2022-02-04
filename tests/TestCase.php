@@ -3,6 +3,7 @@
 namespace RenokiCo\LaravelExporter\Test;
 
 use Orchestra\Testbench\TestCase as Orchestra;
+use RenokiCo\LaravelExporter\Exporter;
 
 abstract class TestCase extends Orchestra
 {
@@ -12,6 +13,9 @@ abstract class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+
+        Exporter::metrics([]);
+        Exporter::flushResponses();
     }
 
     /**
