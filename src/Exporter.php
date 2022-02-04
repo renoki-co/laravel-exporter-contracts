@@ -37,6 +37,16 @@ class Exporter
     ];
 
     /**
+     * A list, keyed by group names, whose values are strings
+     * that will be sent as response.
+     *
+     * @var array
+     */
+    protected static array $plainTextResponses = [
+        //
+    ];
+
+    /**
      * Set the registry.
      *
      * @param  \Prometheus\CollectorRegistry  $collectorRegistry
@@ -80,12 +90,35 @@ class Exporter
     }
 
     /**
+     * Export a string as response to a group instead of the computed
+     * metrics by the given collectors.
+     *
+     * @param  string  $group
+     * @param  string  $text
+     * @return void
+     */
+    public static function exportResponse(string $text, string $group = 'metrics')
+    {
+        static::$plainTextResponses[$group] = $text;
+    }
+
+    /**
+     * Flush responses.
+     *
+     * @retunr void
+     */
+    public static function flushResponses()
+    {
+        static::$plainTextResponses = [];
+    }
+
+    /**
      * Add the registered metrics to the Prometheus registry.
      *
      * @param  string  $group
      * @return \Prometheus\CollectorRegistry
      */
-    public static function run($group = 'metrics')
+    public static function run(string $group = 'metrics')
     {
         foreach (static::$metrics as $metricClass) {
             if (! isset(static::$registries[$metricClass::$showsOnGroup])) {
@@ -122,6 +155,10 @@ class Exporter
      */
     public static function exportAsPlainText(string $group = 'metrics'): string
     {
+        if ($text = static::$plainTextResponses[$group] ?? false) {
+            return $text;
+        }
+
         return (new RenderTextFormat)->render(
             static::run($group)->getMetricFamilySamples()
         );
