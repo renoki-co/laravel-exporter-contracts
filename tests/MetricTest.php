@@ -9,7 +9,7 @@ use RenokiCo\LaravelExporter\Test\Fixtures\TestMetric;
 
 class MetricTest extends TestCase
 {
-    public function test_registering_metric()
+    public function test_registering_metric(): void
     {
         Exporter::metrics([TestMetric::class]);
         Exporter::metrics([TestMetric::class]);
@@ -38,7 +38,7 @@ class MetricTest extends TestCase
             ->assertDontSee('laravel_test_metric');
     }
 
-    public function test_metrics_modification_without_update()
+    public function test_metrics_modification_without_update(): void
     {
         Exporter::metrics([OutsideMetric::class]);
 
@@ -57,7 +57,7 @@ class MetricTest extends TestCase
         );
     }
 
-    public function test_response_with_plain_text()
+    public function test_response_with_plain_text(): void
     {
         Exporter::metrics([OutsideMetric::class]);
 
@@ -78,7 +78,7 @@ class MetricTest extends TestCase
         );
     }
 
-    public function test_response_with_plain_text_on_different_group()
+    public function test_response_with_plain_text_on_different_group(): void
     {
         Exporter::metrics([OutsideMetric::class]);
 
@@ -102,5 +102,11 @@ class MetricTest extends TestCase
             'some-random-text',
             Exporter::exportAsPlainText('metrics2')
         );
+    }
+
+    public function test_unknown_group(): void
+    {
+        $registry = Exporter::run('you-dont-know-me');
+        self::assertNotNull($registry);
     }
 }

@@ -144,7 +144,7 @@ class Exporter
             static::$registeredMetrics[$metricClass] = $metric;
         }
 
-        return static::$registries[$group];
+        return static::$registries[$group] ?? new CollectorRegistry(new InMemory);
     }
 
     /**
