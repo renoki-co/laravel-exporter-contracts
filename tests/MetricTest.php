@@ -109,4 +109,35 @@ class MetricTest extends TestCase
         $registry = Exporter::run('you-dont-know-me');
         self::assertNotNull($registry);
     }
+
+    public function test_response_with_callable_plain_text(): void
+    {
+        Exporter::metrics([OutsideMetric::class]);
+
+        Exporter::metric(OutsideMetric::class)->incBy(20);
+
+        $this->assertStringContainsString(
+            'laravel_outside_metric{label="default-label"} 20',
+            Exporter::exportAsPlainText()
+        );
+
+        Exporter::metric(OutsideMetric::class)->incBy(20, ['label' => 'injected-value']);
+
+        $triggered = false;
+
+        Exporter::exportResponse(function () use (&$triggered) {
+            $triggered = true;
+
+            return 'some-random-text';
+        });
+
+        $this->assertFalse($triggered);
+
+        $this->assertStringContainsString(
+            'some-random-text',
+            Exporter::exportAsPlainText()
+        );
+
+        $this->assertTrue($triggered);
+    }
 }

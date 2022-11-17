@@ -93,13 +93,13 @@ class Exporter
      * Export a string as response to a group instead of the computed
      * metrics by the given collectors.
      *
-     * @param  string  $group
-     * @param  string  $text
+     * @param  string|callable  $handler
+     * @param  string|callable  $group
      * @return void
      */
-    public static function exportResponse(string $text, string $group = 'metrics')
+    public static function exportResponse(string|callable $handler, string $group = 'metrics')
     {
-        static::$plainTextResponses[$group] = $text;
+        static::$plainTextResponses[$group] = $handler;
     }
 
     /**
@@ -155,8 +155,8 @@ class Exporter
      */
     public static function exportAsPlainText(string $group = 'metrics'): string
     {
-        if ($text = static::$plainTextResponses[$group] ?? false) {
-            return $text;
+        if ($handler = static::$plainTextResponses[$group] ?? false) {
+            return is_callable($handler) ? $handler() : $handler;
         }
 
         return (new RenderTextFormat)->render(
