@@ -127,6 +127,7 @@ class MetricTest extends TestCase
 
         Exporter::exportResponse(function () use (&$triggered) {
             $triggered = true;
+
             return 'some-random-text';
         });
 
