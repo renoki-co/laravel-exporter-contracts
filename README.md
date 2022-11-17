@@ -181,12 +181,14 @@ To do so, use the `exportResponse` function. The function will return the respon
 ```php
 use RenokiCo\LaravelExporter\Exporter;
 
-Exporter::exportResponse(<<<'PROM'
-# TYPE openswoole_max_conn gauge
-openswoole_max_conn 256
-# TYPE openswoole_coroutine_num gauge
-openswoole_coroutine_num 1
-PROM;)
+Exporter::exportResponse(function () {
+    return <<<'PROM'
+    # TYPE openswoole_max_conn gauge
+    openswoole_max_conn 256
+    # TYPE openswoole_coroutine_num gauge
+    openswoole_coroutine_num 1
+    PROM;
+);
 ```
 
 When accessing the `/metrics` endpoint, the response will be the one declared earlier.
